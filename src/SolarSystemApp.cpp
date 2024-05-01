@@ -32,6 +32,9 @@ public:
 	gl::BatchRef batchRef;			// Reference to the batch this geometry uses
 
 	void draw() {
+		gl::ScopedModelMatrix scpModelMatrix;
+		gl::translate(orbitDistance, 0, orbitOffset);
+		gl::scale(radius, radius, radius);
 		textureRef->bind();
 		batchRef->draw();
 	}
@@ -62,8 +65,15 @@ private:
 	vec2 lastMousePos;
 	vec3 camLookAtPos = vec3(0, 0, 0);
 
-	// you can delete this
-	SphereObject sphere;
+	SphereObject sun;
+	SphereObject mercury;
+	SphereObject venus;
+	SphereObject earth;
+	SphereObject mars;
+	SphereObject jupiter;
+	SphereObject saturn;
+	SphereObject uranus;
+	SphereObject neptune;
 };
 
 void SolarSystemApp::setup() {
@@ -75,8 +85,52 @@ void SolarSystemApp::setup() {
 
 	auto textureShader = gl::ShaderDef().texture().lambert();
 	auto texShaderRef = gl::getStockShader(textureShader);
-	sphere.textureRef = gl::Texture::create(loadImage(loadAsset("sun.jpg")));
-	sphere.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+
+	// Sizes relative to Earth, taken from https://science.nasa.gov/resource/solar-system-sizes/
+
+	sun.textureRef = gl::Texture::create(loadImage(loadAsset("sun.jpg")));
+	sun.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	sun.orbitOffset = 20.0f;
+	sun.radius = 20.0f;
+
+	mercury.textureRef = gl::Texture::create(loadImage(loadAsset("mercury.jpg")));
+	mercury.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	mercury.orbitOffset = -5.0f;
+	mercury.radius = 0.33f;
+
+	venus.textureRef = gl::Texture::create(loadImage(loadAsset("venus.jpg")));
+	venus.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	venus.radius = 0.95f;
+	venus.orbitOffset = -10.0f;
+
+	earth.textureRef = gl::Texture::create(loadImage(loadAsset("earth.jpg")));
+	earth.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	earth.orbitOffset = -15.0f;
+
+	mars.textureRef = gl::Texture::create(loadImage(loadAsset("mars.jpg")));
+	mars.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	mars.radius = 0.5f;
+	mars.orbitOffset = -20.0f;
+
+	jupiter.textureRef = gl::Texture::create(loadImage(loadAsset("jupiter.jpg")));
+	jupiter.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	jupiter.radius = 11.0f;
+	jupiter.orbitOffset = -45.0f;
+
+	saturn.textureRef = gl::Texture::create(loadImage(loadAsset("saturn.jpg")));
+	saturn.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	saturn.radius = 9.0f;
+	saturn.orbitOffset = -70.0f;
+
+	uranus.textureRef = gl::Texture::create(loadImage(loadAsset("uranus.jpg")));
+	uranus.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	uranus.radius = 4.0f;
+	uranus.orbitOffset = -85.0f;
+
+	neptune.textureRef = gl::Texture::create(loadImage(loadAsset("neptune.jpg")));
+	neptune.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	neptune.radius = 3.85f;
+	neptune.orbitOffset = -95.0f;
 
 	// Text Window
 	interfaceRef = params::InterfaceGl::create(getWindow(), "Solar System", toPixels(ivec2(230, 100)));
@@ -157,7 +211,15 @@ void SolarSystemApp::draw() {
 	gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	gl::setMatrices(cam);
 
-	sphere.draw();
+	sun.draw();
+	mercury.draw();
+	venus.draw();
+	earth.draw();
+	mars.draw();
+	jupiter.draw();
+	saturn.draw();
+	uranus.draw();
+	neptune.draw();
 
 	interfaceRef->draw();
 }
