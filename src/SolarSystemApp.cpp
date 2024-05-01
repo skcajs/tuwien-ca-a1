@@ -39,10 +39,9 @@ public:
 
 private:
 	void update() {
-		//gl::pushModelMatrix();
+		gl::ScopedModelMatrix scpModelMatrix;
 		gl::translate(orbitOffset, orbitDistance);
 		gl::scale(radius, radius, radius);
-		//gl::popModelMatrix();
 	}
 };
 
@@ -77,6 +76,7 @@ SolarSystem::SolarSystem() {
 	celestials[2].textureRef = gl::Texture::create(loadImage(loadAsset("venus.jpg")));
 	celestials[2].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	celestials[2].orbitOffset = 4.0f;
+	celestials[1].orbitDistance = 5.0f;
 	celestials[2].radius = 1.0f;
 
 	// earth
@@ -140,6 +140,7 @@ private:
 
 	vec2 lastMousePos;
 	vec3 camLookAtPos = vec3(0, 0, 0);
+
 
 	// you can delete this
 	SolarSystem solarSystem;
@@ -227,44 +228,15 @@ void SolarSystemApp::resize() {
 }
 
 //Called after update()
-//void SolarSystemApp::draw() {
-//	gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//	gl::setMatrices(cam);
-//
-//	solarSystem.draw();
-//
-//	interfaceRef->draw();
-//
-//}
-
-void SolarSystemApp::draw()
-{
+void SolarSystemApp::draw() {
 	gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	gl::setMatrices(cam);
 
-	auto lambert = gl::ShaderDef().lambert().color();
-	auto shader = gl::getStockShader(lambert);
-	shader->bind();
+	solarSystem.draw();
 
-	int numSpheres = 64;
-	float maxAngle = M_PI * 7;
-	float spiralRadius = 1;
-	float height = 3;
+	interfaceRef->draw();
 
-	for (int s = 0; s < numSpheres; ++s) {
-		float rel = s / (float)numSpheres;
-		float angle = rel * maxAngle;
-		float y = rel * height;
-		float r = rel * spiralRadius * spiralRadius;
-		vec3 offset(r * cos(angle), y, r * sin(angle));
-
-		gl::pushModelMatrix();
-		gl::translate(offset);
-		gl::color(Color(CM_HSV, rel, 1, 1));
-		gl::drawSphere(vec3(), 0.1f, 30);
-		gl::popModelMatrix();
-	}
 }
+
 
 CINDER_APP(SolarSystemApp, RendererGl)
