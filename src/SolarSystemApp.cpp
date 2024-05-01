@@ -32,10 +32,89 @@ public:
 	gl::BatchRef batchRef;			// Reference to the batch this geometry uses
 
 	void draw() {
+		update();
 		textureRef->bind();
 		batchRef->draw();
 	}
+
+private:
+	void update() {
+		//gl::pushModelMatrix();
+		gl::translate(orbitOffset, orbitDistance);
+		gl::scale(radius, radius, radius);
+		//gl::popModelMatrix();
+	}
 };
+
+// May come in handy later
+class SolarSystem {
+public:
+	SolarSystem();
+	void draw();
+
+private:
+	SphereObject celestials[6];
+};
+
+SolarSystem::SolarSystem() {
+	auto textureShader = gl::ShaderDef().texture().lambert();
+	auto texShaderRef = gl::getStockShader(textureShader);
+
+	// sun
+	celestials[0].textureRef = gl::Texture::create(loadImage(loadAsset("sun.jpg")));
+	celestials[0].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	celestials[0].radius = 1.0f;
+
+	// mercury
+	celestials[1].textureRef = gl::Texture::create(loadImage(loadAsset("mercury.jpg")));
+	celestials[1].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	celestials[1].orbitOffset = 2.0f;
+	celestials[1].orbitDistance = 3.0f;
+	celestials[1].radius = 0.5f;
+
+
+	// venus
+	celestials[2].textureRef = gl::Texture::create(loadImage(loadAsset("venus.jpg")));
+	celestials[2].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	celestials[2].orbitOffset = 4.0f;
+	celestials[2].radius = 1.0f;
+
+	// earth
+	celestials[3].textureRef = gl::Texture::create(loadImage(loadAsset("earth.jpg")));
+	celestials[3].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	celestials[3].orbitOffset = 6.0f;
+	celestials[3].radius = 1.0f;
+
+	// moon
+	celestials[4].textureRef = gl::Texture::create(loadImage(loadAsset("moon.jpg")));
+	celestials[4].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	celestials[4].orbitOffset = 6.01f;
+	celestials[4].radius = 1.0f;
+
+	// mars
+	celestials[5].textureRef = gl::Texture::create(loadImage(loadAsset("moon.jpg")));
+	celestials[5].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	celestials[5].orbitOffset = 6.2f;
+	celestials[5].radius = 1.0f;
+
+	//celestials[6].textureRef = gl::Texture::create(loadImage(loadAsset("jupiter.jpg")));
+	//celestials[6].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+
+	//celestials[7].textureRef = gl::Texture::create(loadImage(loadAsset("saturn.jpg")));
+	//celestials[7].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+
+	//celestials[8].textureRef = gl::Texture::create(loadImage(loadAsset("uranus.jpg")));
+	//celestials[8].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+
+	//celestials[8].textureRef = gl::Texture::create(loadImage(loadAsset("neptune.jpg")));
+	//celestials[8].batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+}
+
+void SolarSystem::draw() {
+	for (SphereObject celestial : celestials) {
+		celestial.draw();
+	}
+}
 
 class SolarSystemApp : public App {
 public:
@@ -63,7 +142,7 @@ private:
 	vec3 camLookAtPos = vec3(0, 0, 0);
 
 	// you can delete this
-	SphereObject sphere;
+	SolarSystem solarSystem;
 };
 
 void SolarSystemApp::setup() {
@@ -72,11 +151,6 @@ void SolarSystemApp::setup() {
 	cameraEye = vec3(5.0, 1.0, 5.0);
 	cam.setEyePoint(cameraEye);
 	cam.lookAt(vec3(0, 0, 0));
-
-	auto textureShader = gl::ShaderDef().texture().lambert();
-	auto texShaderRef = gl::getStockShader(textureShader);
-	sphere.textureRef = gl::Texture::create(loadImage(loadAsset("sun.jpg")));
-	sphere.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 
 	// Text Window
 	interfaceRef = params::InterfaceGl::create(getWindow(), "Solar System", toPixels(ivec2(230, 100)));
@@ -153,13 +227,44 @@ void SolarSystemApp::resize() {
 }
 
 //Called after update()
-void SolarSystemApp::draw() {
+//void SolarSystemApp::draw() {
+//	gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	gl::setMatrices(cam);
+//
+//	solarSystem.draw();
+//
+//	interfaceRef->draw();
+//
+//}
+
+void SolarSystemApp::draw()
+{
 	gl::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	gl::setMatrices(cam);
 
-	sphere.draw();
+	auto lambert = gl::ShaderDef().lambert().color();
+	auto shader = gl::getStockShader(lambert);
+	shader->bind();
 
-	interfaceRef->draw();
+	int numSpheres = 64;
+	float maxAngle = M_PI * 7;
+	float spiralRadius = 1;
+	float height = 3;
+
+	for (int s = 0; s < numSpheres; ++s) {
+		float rel = s / (float)numSpheres;
+		float angle = rel * maxAngle;
+		float y = rel * height;
+		float r = rel * spiralRadius * spiralRadius;
+		vec3 offset(r * cos(angle), y, r * sin(angle));
+
+		gl::pushModelMatrix();
+		gl::translate(offset);
+		gl::color(Color(CM_HSV, rel, 1, 1));
+		gl::drawSphere(vec3(), 0.1f, 30);
+		gl::popModelMatrix();
+	}
 }
 
 CINDER_APP(SolarSystemApp, RendererGl)
