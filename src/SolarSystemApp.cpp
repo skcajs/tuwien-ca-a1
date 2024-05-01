@@ -12,6 +12,7 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
+float speed = 0.25f;
 float currentTime = 0.0f;
 double lastTime = 0;
 double deltaTime = 0.1;
@@ -24,23 +25,24 @@ std::uniform_real_distribution<float> uniformRadianDistribution(0.0f, static_cas
 
 class SphereObject {
 public:
-	float orbitRotationSpeed = 1.0f; // Speed of the orbit Rotation
+	float orbitRotationSpeed = 0.0f; // Speed of the orbit Rotation
 	float orbitOffset = 0.0f;        // Relative Offset for this Object
 	float orbitDistance = 0.0f;
 
 	float axisRotationSpeed = 0.0f;	// Speed of rotation
-	float currentAngle = 0.0f;		// Current angle of rotation
+	float rotationAngle = 0.0f;		// Current angle of rotation
 	float radius = 1.0;             // Radius of this sphere object
 
 	gl::TextureRef textureRef;		// Reference to the Texture this object uses
 	gl::BatchRef batchRef;			// Reference to the batch this geometry uses
 
 	void draw() {
-		currentAngle += axisRotationSpeed * deltaTime;
+		rotationAngle += axisRotationSpeed * deltaTime;
+		orbitOffset += orbitRotationSpeed * deltaTime * speed;
 		gl::ScopedModelMatrix scpModelMatrix;
-		gl::translate(orbitDistance, 0, orbitOffset);
+		gl::translate(orbitDistance * sin(orbitOffset), 0, orbitDistance * cos(orbitOffset));
 		gl::scale(radius, radius, radius);
-		gl::rotate(angleAxis(currentAngle, vec3(0, 1, 0)));
+		gl::rotate(angleAxis(rotationAngle, vec3(0, 1, 0)));
 		textureRef->bind();
 		batchRef->draw();
 	}
@@ -84,6 +86,7 @@ private:
 
 void SolarSystemApp::setup() {
 	std::cout << "setup" << std::endl;
+
 	// Camera Setup
 	cameraEye = vec3(125.0, 0.0, -30.0);
 	cam.setEyePoint(cameraEye);
@@ -100,48 +103,64 @@ void SolarSystemApp::setup() {
 	mercury.textureRef = gl::Texture::create(loadImage(loadAsset("mercury.jpg")));
 	mercury.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	mercury.radius = 0.38f;
-	mercury.orbitOffset = calculateOrbitOffset(sun.orbitOffset, sun.radius, mercury.radius + 5.0f);
+	mercury.orbitDistance = calculateOrbitOffset(sun.orbitDistance, sun.radius, mercury.radius + 5.0f);
+	mercury.orbitOffset = uniformRadianDistribution(rndGen);
+	mercury.orbitRotationSpeed = 4.15f;
 	mercury.axisRotationSpeed = 0.017f;
 
 	venus.textureRef = gl::Texture::create(loadImage(loadAsset("venus.jpg")));
 	venus.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	venus.radius = 0.95f;
-	venus.orbitOffset = calculateOrbitOffset(mercury.orbitOffset, mercury.radius, venus.radius);
+	venus.orbitDistance = calculateOrbitOffset(mercury.orbitDistance, mercury.radius, venus.radius);
+	venus.orbitOffset = uniformRadianDistribution(rndGen);
+	venus.orbitRotationSpeed = 1.62f;
 	venus.axisRotationSpeed = 0.004f;
 
 	earth.textureRef = gl::Texture::create(loadImage(loadAsset("earth.jpg")));
 	earth.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
-	earth.orbitOffset = calculateOrbitOffset(venus.orbitOffset, venus.radius, earth.radius);
+	earth.orbitDistance = calculateOrbitOffset(venus.orbitDistance, venus.radius, earth.radius);
+	earth.orbitOffset = uniformRadianDistribution(rndGen);
+	earth.orbitRotationSpeed = 1.0f;
 	earth.axisRotationSpeed = 1.0f;
 
 	mars.textureRef = gl::Texture::create(loadImage(loadAsset("mars.jpg")));
 	mars.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	mars.radius = 0.53f;
-	mars.orbitOffset = calculateOrbitOffset(earth.orbitOffset, earth.radius, mars.radius);
+	mars.orbitDistance = calculateOrbitOffset(earth.orbitDistance, earth.radius, mars.radius);
+	mars.orbitOffset = uniformRadianDistribution(rndGen);
+	mars.orbitRotationSpeed = 0.53f;
 	mars.axisRotationSpeed = 0.96f;
 
 	jupiter.textureRef = gl::Texture::create(loadImage(loadAsset("jupiter.jpg")));
 	jupiter.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	jupiter.radius = 10.97f;
-	jupiter.orbitOffset = calculateOrbitOffset(mars.orbitOffset, mars.radius, jupiter.radius);
+	jupiter.orbitDistance = calculateOrbitOffset(mars.orbitDistance, mars.radius, jupiter.radius);
+	jupiter.orbitOffset = uniformRadianDistribution(rndGen);
+	jupiter.orbitRotationSpeed = 0.08f;
 	jupiter.axisRotationSpeed = 2.4f;
 
 	saturn.textureRef = gl::Texture::create(loadImage(loadAsset("saturn.jpg")));
 	saturn.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	saturn.radius = 9.14f;
-	saturn.orbitOffset = calculateOrbitOffset(jupiter.orbitOffset, jupiter.radius, saturn.radius);
+	saturn.orbitDistance = calculateOrbitOffset(jupiter.orbitDistance, jupiter.radius, saturn.radius);
+	saturn.orbitOffset = uniformRadianDistribution(rndGen);
+	saturn.orbitRotationSpeed = 0.033f;
 	saturn.axisRotationSpeed = 2.18f;
 
 	uranus.textureRef = gl::Texture::create(loadImage(loadAsset("uranus.jpg")));
 	uranus.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	uranus.radius = 3.98f;
-	uranus.orbitOffset = calculateOrbitOffset(saturn.orbitOffset, saturn.radius, uranus.radius);
+	uranus.orbitDistance = calculateOrbitOffset(saturn.orbitDistance, saturn.radius, uranus.radius);
+	uranus.orbitOffset = uniformRadianDistribution(rndGen);
+	uranus.orbitRotationSpeed = 0.012f;
 	uranus.axisRotationSpeed = -1.41f;
 
 	neptune.textureRef = gl::Texture::create(loadImage(loadAsset("neptune.jpg")));
 	neptune.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	neptune.radius = 3.86f;
-	neptune.orbitOffset = calculateOrbitOffset(uranus.orbitOffset, uranus.radius, neptune.radius);
+	neptune.orbitDistance = calculateOrbitOffset(uranus.orbitDistance, uranus.radius, neptune.radius);
+	neptune.orbitOffset = uniformRadianDistribution(rndGen);
+	neptune.orbitRotationSpeed = 0.006f;
 	neptune.axisRotationSpeed = -1.5f;
 
 	// Text Window
