@@ -136,13 +136,13 @@ void SolarSystemApp::setup() {
 	uranus.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	uranus.radius = 3.98f;
 	uranus.orbitOffset = calculateOrbitOffset(saturn.orbitOffset, saturn.radius, uranus.radius);
-	uranus.axisRotationSpeed = 1.41f;
+	uranus.axisRotationSpeed = -1.41f;
 
 	neptune.textureRef = gl::Texture::create(loadImage(loadAsset("neptune.jpg")));
 	neptune.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	neptune.radius = 3.86f;
 	neptune.orbitOffset = calculateOrbitOffset(uranus.orbitOffset, uranus.radius, neptune.radius);
-	neptune.axisRotationSpeed = 1.5f;
+	neptune.axisRotationSpeed = -1.5f;
 
 	// Text Window
 	interfaceRef = params::InterfaceGl::create(getWindow(), "Solar System", toPixels(ivec2(230, 100)));
