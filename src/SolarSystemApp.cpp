@@ -99,6 +99,7 @@ void SolarSystemApp::setup() {
 	sun.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	sun.radius = 20.0f;
 	sun.orbitOffset = 20.0f;
+	sun.axisRotationSpeed = 0.04;
 
 	mercury.textureRef = gl::Texture::create(loadImage(loadAsset("mercury.jpg")));
 	mercury.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
