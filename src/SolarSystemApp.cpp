@@ -12,7 +12,7 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-float speed = 1.0f;
+float speed = 50.0f;
 float currentTime = 0.0f;
 double lastTime = 0;
 double deltaTime = 0.1;
