@@ -120,7 +120,7 @@ void SolarSystemApp::setup() {
 	venus.orbitDistance = calculateOrbitOffset(mercury.orbitDistance, mercury.radius, venus.radius);
 	venus.orbitOffset = uniformRadianDistribution(rndGen);
 	venus.orbitRotationSpeed = 1.62f;
-	venus.axisRotationSpeed = 0.004f;
+	venus.axisRotationSpeed = -0.004f;
 
 	earth.textureRef = gl::Texture::create(loadImage(loadAsset("earth.jpg")));
 	earth.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
@@ -177,7 +177,7 @@ void SolarSystemApp::setup() {
 	neptune.orbitDistance = calculateOrbitOffset(uranus.orbitDistance, uranus.radius, neptune.radius);
 	neptune.orbitOffset = uniformRadianDistribution(rndGen);
 	neptune.orbitRotationSpeed = 0.006f;
-	neptune.axisRotationSpeed = -1.5f;
+	neptune.axisRotationSpeed = 1.5f;
 
 	// Text Window
 	interfaceRef = params::InterfaceGl::create(getWindow(), "Solar System", toPixels(ivec2(230, 100)));
@@ -280,8 +280,15 @@ CINDER_APP(SolarSystemApp, RendererGl)
 
 /*
 * Comments
-* All sizes of the planets are relative to earth, taken from https://science.nasa.gov/resource/solar-system-sizes/
-* For the distances from the sun, initially I set the scaled positions to the sun, which sort of worked, but Saturn, Uranus and Neptune were very spaced out.
+* Points covered:
+* 1] The sun is located at (0,0,0).
+* 2] All planets orbit the sun, and the moon orbits the earth.
+* 3] Venus and Uranus spin clockwise (the others spin anti-clockwise)
+* 4] All sizes of the planets are relative to earth, taken from https://science.nasa.gov/resource/solar-system-sizes/. All are visible in one frame.
+* 5] Nasa pages were used for determining sizes, and are all relative to the earth (setting earth as 1 for everything, then dividing by earth measurements, see below).
+* 6] Planet inital locations are randomised.
+* 7] You can control the speed using the GUI.
+* 8] For the distances from the sun, initially I set the scaled positions to the sun, which sort of worked, but Saturn, Uranus and Neptune were very spaced out.
 * A quick fix would have been to adjust the positions for the Jovian (gas) planets so that they looked uniform, but then they would more or less be uniformly spaced out.  
 * Next I thought of setting their positions to a logarithmic scale. 
 * This ended up looking worse as the Terrestrial planets looked very unevenly placed. So I figured the best solution (and the easiest)
@@ -292,4 +299,17 @@ CINDER_APP(SolarSystemApp, RendererGl)
 * Likewise, the rotation orbital period of a planet is based on the Earths orbit (in earth days), and adjusted accordingly (by divinding by 365.26).
 * Just to note, the orbital periods and the planetary rotations aren't synchronised.
 * The moon orbits the earth, which I set by adding an additional satellite rotation and orbit period.
+* 
+*		 		Size	Earth Size		Distance	Day	Earth	Day				1/Earth Days	Year			Earth Year		1/Earth Year
+	mercury		2,440	0.382985403		57			1408		58.66666667		0.017045455		87.97			0.24084214		4.152097306
+	venus		6,052	0.949929367		108			5832		243				0.004115226		224.7			0.615178229		1.625545171
+	earth		6,371	1				149			24			1				1				365.26			1				1
+	mars		3,390	0.532098572		228			25			1.041666667		0.96			686.98			1.88079724		0.531689423
+	jupyter		69,911	10.97331659		780			10			0.416666667		2.4				4331.865		11.8596753		0.084319341
+	saturn		58,232	9.140166379		1437		11			0.458333333		2.181818182		10760.5596		29.46			0.033944331
+	uranus		25,362	3.98085073		2871		17			0.708333333		1.411764706		30685.4926		84.01			0.011903345
+	neptune		24,622	3.864699419		4530		16			0.666666667		1.5				60154.6694		164.69			0.006072014
+
+* 
+* 
 */
