@@ -41,7 +41,7 @@ public:
 	gl::BatchRef batchRef;			// Reference to the batch this geometry uses
 
 	void draw() {
-		rotationAngle += axisRotationSpeed * deltaTime;
+		rotationAngle += axisRotationSpeed * deltaTime * speed;
 		orbitOffset += orbitRotationSpeed * deltaTime * speed;
 		satelliteOffset += satelliteRotationSpeed * deltaTime * speed;
 		gl::ScopedModelMatrix scpModelMatrix;
