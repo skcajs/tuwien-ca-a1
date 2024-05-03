@@ -12,10 +12,12 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-float speed = 0.25f;
+float speed = 1.0f;
 float currentTime = 0.0f;
 double lastTime = 0;
 double deltaTime = 0.1;
+
+const float EARTH_PERIOD = 1 / 365.26f;
 
 // Comments at the bottom
 // You might find these useful
@@ -42,7 +44,7 @@ public:
 
 	void draw() {
 		rotationAngle += axisRotationSpeed * deltaTime * speed;
-		orbitOffset += orbitRotationSpeed * deltaTime * speed;
+		orbitOffset += orbitRotationSpeed * EARTH_PERIOD * deltaTime * speed;
 		satelliteOffset += satelliteRotationSpeed * deltaTime * speed;
 		gl::ScopedModelMatrix scpModelMatrix;
 		gl::translate(orbitDistance * sin(orbitOffset), 0, orbitDistance * cos(orbitOffset));
@@ -134,8 +136,8 @@ void SolarSystemApp::setup() {
 	moon.radius = 0.27f;
 	moon.orbitDistance = earth.orbitDistance + moon.satelliteDistance;
 	moon.orbitOffset = earth.orbitOffset;
-	moon.satelliteDistance = earth.radius + 1.0f;
-	moon.satelliteRotationSpeed = 2.0f;
+	moon.satelliteDistance = earth.radius + 0.75f;
+	moon.satelliteRotationSpeed = 1.0f / 27.3f;
 	moon.orbitRotationSpeed = 1.0f;
 	moon.axisRotationSpeed = 1.0f;
 
@@ -297,7 +299,7 @@ CINDER_APP(SolarSystemApp, RendererGl)
 * and so are the Jovian... to a slightly lesser degree), so uniformly spacing the planets seemed apropriate here.
 * The spin of the planets are all based off an earth day. So for each planet, I found out how long a day is (in earth hours), and adjusted accordingly (by divinding by 24).
 * Likewise, the rotation orbital period of a planet is based on the Earths orbit (in earth days), and adjusted accordingly (by divinding by 365.26).
-* Just to note, the orbital periods and the planetary rotations aren't synchronised.
+* To synchronise the axis rotation with the orbit, I just mutliplied the rotation speed by a factor of 1/365.26...This is "probably" correct (ish). 
 * The moon orbits the earth, which I set by adding an additional satellite rotation and orbit period.
 * 
 *		 		Size	Earth Size		Distance	Day	Earth	Day				1/Earth Days	Year			Earth Year		1/Earth Year
