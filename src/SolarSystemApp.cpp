@@ -94,7 +94,7 @@ void SolarSystemApp::setup() {
 	std::cout << "setup" << std::endl;
 
 	// Camera Setup
-	cameraEye = vec3(125.0, 0.0, -30.0);
+	cameraEye = vec3(250.0, 0.0, -30.0);
 	cam.setEyePoint(cameraEye);
 	cam.lookAt(vec3(0, 0, -30));
 
@@ -104,7 +104,6 @@ void SolarSystemApp::setup() {
 	sun.textureRef = gl::Texture::create(loadImage(loadAsset("sun.jpg")));
 	sun.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
 	sun.radius = 20.0f;
-	sun.orbitOffset = 20.0f;
 	sun.axisRotationSpeed = 0.04;
 
 	mercury.textureRef = gl::Texture::create(loadImage(loadAsset("mercury.jpg")));
