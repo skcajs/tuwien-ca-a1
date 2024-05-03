@@ -29,6 +29,10 @@ public:
 	float orbitOffset = 0.0f;        // Relative Offset for this Object
 	float orbitDistance = 0.0f;
 
+	float satelliteRotationSpeed = 0.0f;
+	float satelliteDistance = 0.0f;
+	float satelliteOffset = 0.0f;
+
 	float axisRotationSpeed = 0.0f;	// Speed of rotation
 	float rotationAngle = 0.0f;		// Current angle of rotation
 	float radius = 1.0;             // Radius of this sphere object
@@ -39,8 +43,10 @@ public:
 	void draw() {
 		rotationAngle += axisRotationSpeed * deltaTime;
 		orbitOffset += orbitRotationSpeed * deltaTime * speed;
+		satelliteOffset += satelliteRotationSpeed * deltaTime * speed;
 		gl::ScopedModelMatrix scpModelMatrix;
 		gl::translate(orbitDistance * sin(orbitOffset), 0, orbitDistance * cos(orbitOffset));
+		gl::translate(satelliteDistance * sin(satelliteOffset), 0, satelliteDistance * cos(satelliteOffset));
 		gl::scale(radius, radius, radius);
 		gl::rotate(angleAxis(rotationAngle, vec3(0, 1, 0)));
 		textureRef->bind();
@@ -66,7 +72,6 @@ private:
 	params::InterfaceGlRef interfaceRef;
 
 	float avgFPS = 0.f;
-	float speed = 1.0;
 
 	float calculateOrbitOffset(float lastOrbitOffset, float lastRadius, float nextRadius);
 
@@ -77,6 +82,7 @@ private:
 	SphereObject mercury;
 	SphereObject venus;
 	SphereObject earth;
+	SphereObject moon;
 	SphereObject mars;
 	SphereObject jupiter;
 	SphereObject saturn;
@@ -123,6 +129,16 @@ void SolarSystemApp::setup() {
 	earth.orbitOffset = uniformRadianDistribution(rndGen);
 	earth.orbitRotationSpeed = 1.0f;
 	earth.axisRotationSpeed = 1.0f;
+
+	moon.textureRef = gl::Texture::create(loadImage(loadAsset("moon.jpg")));
+	moon.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
+	moon.radius = 0.27f;
+	moon.orbitDistance = earth.orbitDistance + moon.satelliteDistance;
+	moon.orbitOffset = earth.orbitOffset;
+	moon.satelliteDistance = earth.radius + 1.0f;
+	moon.satelliteRotationSpeed = 2.0f;
+	moon.orbitRotationSpeed = 1.0f;
+	moon.axisRotationSpeed = 1.0f;
 
 	mars.textureRef = gl::Texture::create(loadImage(loadAsset("mars.jpg")));
 	mars.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
@@ -247,6 +263,7 @@ void SolarSystemApp::draw() {
 	mercury.draw();
 	venus.draw();
 	earth.draw();
+	moon.draw();
 	mars.draw();
 	jupiter.draw();
 	saturn.draw();
@@ -265,11 +282,15 @@ CINDER_APP(SolarSystemApp, RendererGl)
 /*
 * Comments
 * All sizes of the planets are relative to earth, taken from https://science.nasa.gov/resource/solar-system-sizes/
-* For the positions, initially I set the positions relative to the sun, which sort of worked, but Saturn, Uranus and Neptune were very spaced out.
+* For the distances from the sun, initially I set the scaled positions to the sun, which sort of worked, but Saturn, Uranus and Neptune were very spaced out.
 * A quick fix would have been to adjust the positions for the Jovian (gas) planets so that they looked uniform, but then they would more or less be uniformly spaced out.  
 * Next I thought of setting their positions to a logarithmic scale. 
-* Honestly, this looked worse as the Terrestrial planets looked very unevenly placed. So I figured the best solution (and the easiest)
-* was to set a uniform distance between all the planets. This was actually convienient as I could create a simple function to work out all the distances relative 
+* This ended up looking worse as the Terrestrial planets looked very unevenly placed. So I figured the best solution (and the easiest)
+* was just to set a uniform distance between all the planets. This was actually convienient as I could create a simple function to work out all the distances relative 
 * to the last. All the planets are all "roughly" uniformely spaced anyway w.r.t their planet types (so, the Terrestrial planets are very evenly spaced, 
-* and so are the Jovian... to a slightly lesser degree), so uniformly spacing the planets is quite common and acceptible, that's how Nasa does it!
+* and so are the Jovian... to a slightly lesser degree), so uniformly spacing the planets seemed apropriate here.
+* The spin of the planets are all based off an earth day. So for each planet, I found out how long a day is (in earth hours), and adjusted accordingly (by divinding by 24).
+* Likewise, the rotation orbital period of a planet is based on the Earths orbit (in earth days), and adjusted accordingly (by divinding by 365.26).
+* Just to note, the orbital periods and the planetary rotations aren't synchronised.
+* The moon orbits the earth, which I set by adding an additional satellite rotation and orbit period.
 */
