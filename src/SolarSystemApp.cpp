@@ -139,7 +139,7 @@ void SolarSystemApp::setup() {
 	moon.satelliteDistance = earth.radius + 0.75f;
 	moon.satelliteRotationSpeed = 1.0f / 27.3f;
 	moon.orbitRotationSpeed = 1.0f;
-	moon.axisRotationSpeed = 1.0f;
+	moon.axisRotationSpeed = 1.0f / 27.3f;
 
 	mars.textureRef = gl::Texture::create(loadImage(loadAsset("mars.jpg")));
 	mars.batchRef = gl::Batch::create(geom::Sphere().subdivisions(256), texShaderRef);
@@ -291,26 +291,27 @@ CINDER_APP(SolarSystemApp, RendererGl)
 * 6] Planet inital locations are randomised.
 * 7] You can control the speed using the GUI.
 * 8] For the distances from the sun, initially I set the scaled positions to the sun, which sort of worked, but Saturn, Uranus and Neptune were very spaced out.
-* A quick fix would have been to adjust the positions for the Jovian (gas) planets so that they looked uniform, but then they would more or less be uniformly spaced out.  
-* Next I thought of setting their positions to a logarithmic scale. 
+* A quick fix would have been to scale the positions for the Jovian (gas) planets. Next I thought of setting their positions to a logarithmic scale. 
 * This ended up looking worse as the Terrestrial planets looked very unevenly placed. So I figured the best solution (and the easiest)
 * was just to set a uniform distance between all the planets. This was actually convienient as I could create a simple function to work out all the distances relative 
 * to the last. All the planets are all "roughly" uniformely spaced anyway w.r.t their planet types (so, the Terrestrial planets are very evenly spaced, 
-* and so are the Jovian... to a slightly lesser degree), so uniformly spacing the planets seemed apropriate here.
+* and so are the Jovian... to a slightly lesser degree), so uniformly spacing the planets seemed apropriate here (and conventional).
 * The spin of the planets are all based off an earth day. So for each planet, I found out how long a day is (in earth hours), and adjusted accordingly (by divinding by 24).
 * Likewise, the rotation orbital period of a planet is based on the Earths orbit (in earth days), and adjusted accordingly (by divinding by 365.26).
-* To synchronise the axis rotation with the orbit, I just mutliplied the rotation speed by a factor of 1/365.26...This is "probably" correct (ish). 
-* The moon orbits the earth, which I set by adding an additional satellite rotation and orbit period.
+* To synchronise the axis rotation with the orbit, I just mutliplied the rotation speed by a factor of 1/365.26...This is "probably" correct. 
+* The moon orbits the earth, which I set by adding an additional satellite rotation and orbit period. The period of orbit and axis rotation speed is 27.3 earth days.
+* Inspecting the rotation of the moon, it appears as though the dark side of the moon is always facing the earth! 
 * 
-*		 		Size	Earth Size		Distance	Day	Earth	Day				1/Earth Days	Year			Earth Year		1/Earth Year
-	mercury		2,440	0.382985403		57			1408		58.66666667		0.017045455		87.97			0.24084214		4.152097306
-	venus		6,052	0.949929367		108			5832		243				0.004115226		224.7			0.615178229		1.625545171
-	earth		6,371	1				149			24			1				1				365.26			1				1
-	mars		3,390	0.532098572		228			25			1.041666667		0.96			686.98			1.88079724		0.531689423
-	jupyter		69,911	10.97331659		780			10			0.416666667		2.4				4331.865		11.8596753		0.084319341
-	saturn		58,232	9.140166379		1437		11			0.458333333		2.181818182		10760.5596		29.46			0.033944331
-	uranus		25,362	3.98085073		2871		17			0.708333333		1.411764706		30685.4926		84.01			0.011903345
-	neptune		24,622	3.864699419		4530		16			0.666666667		1.5				60154.6694		164.69			0.006072014
+*		 		Size	Earth Size		Distance	Day (hours)		Earth Days		1/Earth Days	Years			Earth Years		1/Earth Years
+	mercury		2,440	0.382985403		57			1408			58.66666667		0.017045455		87.97			0.24084214		4.152097306
+	venus		6,052	0.949929367		108			5832			243				0.004115226		224.7			0.615178229		1.625545171
+	earth		6,371	1				149			24				1				1				365.26			1				1
+	mars		3,390	0.532098572		228			25				1.041666667		0.96			686.98			1.88079724		0.531689423
+	jupyter		69,911	10.97331659		780			10				0.416666667		2.4				4331.865		11.8596753		0.084319341
+	saturn		58,232	9.140166379		1437		11				0.458333333		2.181818182		10760.5596		29.46			0.033944331
+	uranus		25,362	3.98085073		2871		17				0.708333333		1.411764706		30685.4926		84.01			0.011903345
+	neptune		24,622	3.864699419		4530		16				0.666666667		1.5				60154.6694		164.69			0.006072014
+	sun			big		very big		0			..				26.6			0.04			..				..				..
 
 * 
 * 
