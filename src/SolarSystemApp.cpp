@@ -300,9 +300,12 @@ CINDER_APP(SolarSystemApp, RendererGl)
 * Likewise, the rotation orbital period of a planet is based on the Earths orbit (in earth days), and adjusted accordingly (by divinding by 365.26).
 * To synchronise the axis rotation with the orbit, I just mutliplied the rotation speed by a factor of 1/365.26...This is "probably" correct. 
 * The moon orbits the earth, which I set by adding an additional satellite rotation and orbit period. The period of orbit and axis rotation speed is 27.3 earth days.
-* Inspecting the rotation of the moon, it appears as though the dark side of the moon is always facing the earth! 
+* Inspecting the rotation of the moon, it appears as though the dark side of the moon is always facing the earth! I tested how many orbits the earth did per complete orbit of
+* Jupiter and it it was around 12 orbits, which is consistent with the data below.
 * 
-*		 		Size	Earth Size		Distance	Day (hours)		Earth Days		1/Earth Days	Years			Earth Years		1/Earth Years
+* Data Used from various sources, and converted:
+* 
+*		 		Size	Earth Size		Distance	Day (hours)		Earth Days		1/Earth Days	Orbit (Days)	Earth Years		1/Earth Years
 	mercury		2,440	0.382985403		57			1408			58.66666667		0.017045455		87.97			0.24084214		4.152097306
 	venus		6,052	0.949929367		108			5832			243				0.004115226		224.7			0.615178229		1.625545171
 	earth		6,371	1				149			24				1				1				365.26			1				1
